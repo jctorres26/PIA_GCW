@@ -1,0 +1,17 @@
+.body { background-color: #04438b; font-family: "Droid Serif"; font-size: 24px; font-style: normal; font-variant: normal; font-weight: 700; line-height: 26.4px; } h3 { font-family: "Droid Serif"; font-size: 14px; font-style: normal; font-variant: normal; font-weight: 700; line-height: 15.4px; } p { font-family: "Droid Serif"; font-size: 14px; font-style: normal; font-variant: normal; font-weight: 400; line-height: 20px; } blockquote { font-family: "Droid Serif"; font-size: 21px; font-style: normal; font-variant: normal; font-weight: 400; line-height: 30px; } pre { font-family: "Droid Serif"; font-size: 13px; font-style: normal; font-variant: normal; font-weight: 400; line-height: 18.5714px; }
+  .btn-light {
+    
+      margin-top: 20px;
+      min-width: 20%;
+      min-height: 40px;
+  }
+  .img {
+      max-height: 30% ;
+      margin-left: 28%;
+      max-width: 45%;
+      margin-top: 10%;
+  }
+  .ajuste {
+      min-width: 7%;
+      margin-right: 1%;
+  }
