@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script
+      src="https://code.jquery.com/jquery-3.6.0.js"
+      integrity="sha256-H+K7U5CnXl1h5ywQfKtSj8PCmoN9aaq30gDh27Xc0jk="
+      crossorigin="anonymous"
+    ></script>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC"
+      crossorigin="anonymous"
+    />
+    <title>Tarea1</title>
+  </head>
+
+  <body class="main">
+    <body>
+      <div class="container-fluid">
+        <div class="d-flex justify-content-center">
+          <button type="button" class="btn btn-primary">Añadir elemento</button>
+          <button type="button" class="btn btn-danger">
+            Eliminar elemento
+          </button>
+        </div>
+        <div class="d-flex justify-content-center">
+          <div class="d-flex flex-column bd-highlight mb-3 elements">
+            <br />
+            <h4>Cantidad de elementos:</h4>
+            <input
+              class="form-control"
+              type="text"
+              aria-label="Disabled input example"
+              id="quantityElements"
+              disabled
+              readonly
+            />
+            <hr />
+          </div>
+        </div>
+      </div>
+    </body>
+    <script>
+      $(document).ready(function () {
+        var elements = 0;
+        $("#quantityElements").val(elements);
+        $(".btn-primary").click(function () {
+          $(".elements").append(
+            '<span class="badge bg-secondary" id="elemento">Soy un nuevo elemento!</span>'
+          );
+          elements = elements + 1;
+          $("#quantityElements").val(elements);
+        });
+
+        $(".btn-danger").click(function () {
+          $("#elemento").remove();
+          if (elements == 0) {
+            alert("No hay mas elementos para borrar");
+          } else {
+            elements = elements - 1;
+            $("#quantityElements").val(elements);
+          }
+        });
+      });
+    </script>
+  </body>
+</html>
+<style>
+  .badge {
+    margin-bottom: 5px;
+  }
+
+  .btn {
+    margin: 5px;
+  }
+
+  .main {
+    background-color: rgb(223, 211, 211);
+  }
+</style>
