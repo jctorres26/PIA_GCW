@@ -21,7 +21,7 @@
   </head>
   <body class="body">
     <div class="d-flex justify-content-end">
-        <button type="button" class="btn btn-light ajuste">Ajustes</button>
+        <button type="button" class="btn btn-light ajuste" onclick="goToURL();">Ajustes</button>
     </div>
     <div class="container">
         
@@ -46,4 +46,10 @@
       </div>
   </body>
 </html>
+
+<script>
+  function goToURL() {
+      location.href = './settings.html';
+  }
+</script>
 
