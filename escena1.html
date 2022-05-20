@@ -1,0 +1,357 @@
+<html>
+<head>
+	<title>2.2 Modelos</title>
+	<script type="text/javascript" src="js/libs/jquery/jquery-2.1.4.min.js"></script>
+	<script type="text/javascript" src="js/libs/three/three2.js"></script>
+	<script type="text/javascript" src="js/libs/three/MTLLoader.js"></script>
+	<script type="text/javascript" src="js/libs/three/OBJLoader.js"></script>
+	<script type="text/javascript" src="js/libs/three/FBXLoader.js"></script>
+	<script type="text/javascript" src="js/libs/three/inflate.min.js"></script>
+	<script type="text/javascript">
+
+	var scene;
+	
+	var visibleSize;
+	var controls;
+	var objects = [];
+	var objs = [];
+	var mixers = [];
+	var mixers_2=[];
+	var clock;
+	var deltaTime;	
+	var keys = {};
+	var jugador1;
+	var jugador2;
+
+	$(document).ready(function() {
+
+		setupScene();
+
+		render();
+
+		document.addEventListener('keydown', onKeyDown);
+		document.addEventListener('keyup', onKeyUp);		
+	});
+
+	function loadOBJWithMTL(path, objFile, mtlFile, onLoadCallback) {
+		
+	}
+
+	function onKeyDown(event) {
+		keys[String.fromCharCode(event.keyCode)] = true;
+	}
+	function onKeyUp(event) {
+		keys[String.fromCharCode(event.keyCode)] = false;
+	}
+
+	
+	function render() {
+		requestAnimationFrame(render);
+		deltaTime = clock.getDelta();	
+
+		for(var i=0; i< cameras.length; i++){
+				cameras[i].yaw =0;
+				cameras[i].forward = 0;
+
+		}
+
+
+		if(mixers.length>0){
+			for(var i=0; i<mixers.length; i++){
+				mixers[i].update(deltaTime);
+			}
+
+		}
+	
+
+		
+		if (keys["A"]) {
+			cameras[0].yaw = 5;
+		} else if (keys["D"]) {
+			cameras[0].yaw = -5;
+		}
+		if (keys["W"]) {
+			cameras[0].forward = -5;
+		} else if (keys["S"]) {
+			cameras[0].forward = 5;
+		}
+
+		if (keys["J"]) {
+			cameras[1].yaw = 5;
+		} else if (keys["L"]) {
+			cameras[1].yaw = -5;
+		}
+		if (keys["I"]) {
+			cameras[1].forward = -5;
+		} else if (keys["K"]) {
+			cameras[1].forward = 5;
+		}
+
+
+		for(var i=0; i<cameras.length; i++){
+			cameras[i].rotation.y += cameras[i].yaw * deltaTime;
+		cameras[i].translateZ(cameras[i].forward * deltaTime);
+
+		renderers[i].render(scene, cameras[i]);
+		
+		}
+
+	
+
+	
+		
+	}
+
+	var cameras = [];
+
+	function crearCamara(){
+		camera = new THREE.PerspectiveCamera(75, visibleSize.width / visibleSize.height, 0.1, 100);
+		
+		camera.yaw = 0;
+		camera.forward = 0;
+
+		cameras.push(camera);
+
+	}
+
+	var renderers = [];
+
+	function crearRenderer(clearColor){
+
+		
+		var renderer = new THREE.WebGLRenderer( {precision: "mediump" } );
+		renderer.setClearColor(clearColor);
+
+		renderer.setPixelRatio((visibleSize.width/2) / visibleSize.height);
+		renderer.setSize(visibleSize.width/2, visibleSize.height);
+
+		renderers.push(renderer);
+
+	}
+
+	var jugadores = [];
+
+	function setupScene() {		
+		visibleSize = { width: window.innerWidth, height: window.innerHeight};
+		clock = new THREE.Clock();		
+		scene = new THREE.Scene();
+
+		crearCamara();
+		crearCamara();
+
+		crearRenderer(new THREE.Color(0,0,0));
+		crearRenderer(new THREE.Color(0,0,0));
+
+		var ambientLight = new THREE.AmbientLight(new THREE.Color(1, 1, 1), 1.0);
+		scene.add(ambientLight);
+
+		var directionalLight = new THREE.DirectionalLight(new THREE.Color(1, 1, 0), 0.4);
+		directionalLight.position.set(0, 0, 1);
+		scene.add(directionalLight);
+
+		var grid = new THREE.GridHelper(100, 30, 0xffffff, 0xffffff);
+		grid.position.y = -1;
+		scene.add(grid);
+
+		
+		var loader = new THREE.FBXLoader();
+
+
+		loader.load('assets/CorrerInPlace.fbx',function(skeleton){
+
+			skeleton.mixer =  new THREE.AnimationMixer(skeleton);
+
+			mixers.push(skeleton.mixer);
+
+			var action = skeleton.mixer.clipAction(skeleton.animations[0]);
+			action.play();
+
+			skeleton.scale.set(0.05,0.05,0.05);
+
+			skeleton.position.z = -10;
+			skeleton.position.x = 0;
+			skeleton.position.y = -2;
+
+			scene.add(skeleton);
+
+		});
+
+		loader.load('assets/AtaqueSkeleton.fbx',function(skeletonAttack){
+
+			skeletonAttack.mixer =  new THREE.AnimationMixer(skeletonAttack);
+
+			mixers.push(skeletonAttack.mixer);
+
+			var action = skeletonAttack.mixer.clipAction(skeletonAttack.animations[0]);
+			action.play();
+
+			skeletonAttack.scale.set(0.05,0.05,0.05);
+
+			skeletonAttack.position.z = -10;
+			skeletonAttack.position.x = -3;
+			skeletonAttack.position.y = -2;
+
+			scene.add(skeletonAttack);
+
+			});
+
+
+		loader.load('assets/Corriendo.fbx',function(wizardRunning){
+
+			wizardRunning.mixer =  new THREE.AnimationMixer(wizardRunning);
+
+			mixers.push(wizardRunning.mixer);
+
+			var action = wizardRunning.mixer.clipAction(wizardRunning.animations[0]);
+			action.play();
+
+			wizardRunning.scale.set(0.05,0.05,0.05);
+
+			wizardRunning.position.z = -10;
+			wizardRunning.position.x = 5;
+			wizardRunning.position.y = -2;
+
+			scene.add(wizardRunning);
+
+
+		});
+
+		loader.load('assets/AtaqueWizard.fbx',function(wizardAttack){
+
+			wizardAttack.mixer =  new THREE.AnimationMixer(wizardAttack);
+
+			mixers.push(wizardAttack.mixer);
+
+			var action = wizardAttack.mixer.clipAction(wizardAttack.animations[0]);
+			action.play();
+
+			wizardAttack.scale.set(0.05,0.05,0.05);
+
+			wizardAttack.position.z = -10;
+			wizardAttack.position.x = 12;
+			wizardAttack.position.y = -2;
+
+			scene.add(wizardAttack);
+
+
+		});
+
+		
+		loader.load('assets/Caminando.fbx',function(wizardWalk){
+
+			wizardWalk.mixer =  new THREE.AnimationMixer(wizardWalk);
+
+			mixers.push(wizardWalk.mixer);
+
+			var action = wizardWalk.mixer.clipAction(wizardWalk.animations[0]);
+			action.play();
+
+			wizardWalk.scale.set(0.05,0.05,0.05);
+
+			wizardWalk.position.z = -10;
+			wizardWalk.position.x = 18;
+			wizardWalk.position.y = -2;
+
+			scene.add(wizardWalk);
+
+
+		});
+
+		loader.load('assets/escenario01.fbx',function(escenario){
+
+			escenario.position.z = -5;
+			escenario.position.x = -50;
+			escenario.position.y = -3;
+
+			escenario.scale.set(0.2,0.2,0.2);
+
+			escenario.name = 'escenario01';
+
+			scene.add(escenario);
+
+		});
+
+		
+		loader.load('assets/Wizard2.fbx',function(wizard2){
+
+			wizard2.position.z = -10;
+			wizard2.position.x = 38;
+			wizard2.position.y = -2;
+
+			wizard2.scale.set(0.05,0.05,0.05);
+
+			
+
+			scene.add(wizard2);
+
+			
+
+		});
+
+		loader.load('assets/medkit.fbx',function(medkit){
+
+			medkit.position.z = -10;
+			medkit.position.x = 42;
+			medkit.position.y = 0;
+
+			medkit.scale.set(0.2,0.2,0.2);
+
+
+
+			scene.add(medkit);
+
+		});
+
+		loader.load('assets/Rayo.fbx',function(rayo){
+
+			rayo.position.z = -10;
+			rayo.position.x = 42;
+			rayo.position.y = -0.4;
+
+			rayo.scale.set(0.2,0.2,0.2);
+
+
+
+			scene.add(rayo);
+
+		});
+
+		loader.load('assets/sword.fbx',function(espada){
+
+			espada.position.z = -10;
+			espada.position.x = 44;
+			espada.position.y = -0.4;
+
+			espada.scale.set(0.2,0.2,0.2);
+
+
+
+			scene.add(espada);
+
+		});
+
+		
+
+		
+
+
+
+		$("#scene-section").append(renderers[0].domElement);
+		$("#scene-section-2").append(renderers[1].domElement);
+		
+
+	}
+
+
+	</script>
+</head>
+
+<body>
+
+	<div style="display: flex; height: 100px;"> 
+	<div style="width: 50%;" id="scene-section"></div>
+	<div style="flex-grow: 1" id="scene-section-2"></div>
+	</div>
+
+</body>
+</html>
