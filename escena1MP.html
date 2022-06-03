@@ -21,10 +21,11 @@
 	crossorigin="anonymous"
   />
 	<script type="text/javascript">
-	
+	var hard = localStorage.getItem("hard");
+	console.log(hard);
 
 	var scene;
-	
+	var loader;
 	var visibleSize;
 	var controls;
 	var objects = [];
@@ -68,7 +69,22 @@
 	var isImmuneP1 = false;
 	var isImmuneP2 = false;
 	var maxAmountEnemies = 5;
+	var hasItem = false;
+	var itemHasSpawned = false;
+	var isFollowing = false;
+	var BBitem;
+
+	if(hard == "true"){
+		 enemyDamage = 2;
+		 enemySpeed = 1.3;
+
+	}else{
+		enemyDamage = 1;
+		enemySpeed = 0.9;
+
+	}
 	
+	console.log("enemy dmg: "+enemyDamage);
 
 
 	$(document).ready(function() {
@@ -233,7 +249,7 @@
 
 		if(keys["F"]&& canShootP1 == true){
 			disparar(jugadores[0]);
-			followPlayer();
+			
 		
 			
 		}
@@ -251,14 +267,17 @@
 		}
 
 		
-
+		if(isFollowing == false){
+			isFollowing=true;
+			followPlayer();
+		}
             
 		///FOLLOW PLAYER
+		if(jugadores[0].isAlive && jugadores[1].isAlive){
 		for(var i=0; i<enemies.length; i++){
 		enemies[i].lookAt(jugadores[playerIndex[i]].position);
 		enemies[i].translateZ(enemySpeed * deltaTime);
-		}
-
+		}}
 
 		for(var i=0; i<jugadores.length; i++){
 			jugadores[i].rotation.y += jugadores[i].yaw * deltaTime;
@@ -294,6 +313,19 @@
 			jugadores[1].translateZ(-(jugadores[1].forward * deltaTime));
 		}
 
+
+		if(itemHasSpawned==true && hasItem == false){
+			var itemP1Collision = P1BB.intersectsBox(BBitem);
+			var itemP2Collision = P2BB.intersectsBox(BBitem);
+			if(itemP1Collision || itemP2Collision){
+				console.log("item");
+				hasItem = true;
+				playerSpeed = 9;
+				var item = scene.getObjectByName("item");
+				scene.remove(item);
+				
+			}
+		}
 
 
 		//ENEMY COLLISION WITH PLAYER 1
@@ -347,16 +379,20 @@
 
 				if(collision && enemies[j].isAlive){
 						balas[i].isAlive = false;
+						
 					
 						enemies[j].health = enemies[j].health - playerDamage;
 
 						if(enemies[j].health <= 0){
+							spawnItem();
+							
 							enemies[j].isAlive = false;
 							reproducirParticulas = true;
 						spawnParticulas(balas[i].position);
 						
 						scene.remove(enemies[j]);
 						killedEnemies++;
+						
 						console.log("mataste al enemigo " + j);
 						}
 					
@@ -424,6 +460,9 @@
 		
 		}
 
+
+		
+
 		if(killedEnemies >= enemiesToKill && hasWon == false){
 			hasWon = true;
 			
@@ -459,7 +498,7 @@
 		}
 
 
-		if(jugadores[0].health <=0){
+		if(jugadores[0].health <=0 ){
 			scene.remove(jugadores[0]);
 			jugadores[0].isAlive = false;
 			canShootP1 = false;
@@ -469,7 +508,7 @@
 		}
 		}
 
-		if(jugadores[1].health <=0){
+		if(jugadores[1].health <=0 ){
 			scene.remove(jugadores[1]);
 			jugadores[1].isAlive = false;
 			canShootP2 = false;
@@ -521,20 +560,43 @@
 	}
 
 	function followPlayer(){
+
+		
 		for(var i=0; i<enemies.length; i++){
 
 		playerIndex[i] = Math.floor( getRandomArbitrary(0,2));
 					
 		console.log(playerIndex[i]);
-
+		}
 		
 
-		}
+		
 
 		
 	}
 
-	
+	function spawnItem(){
+		if(killedEnemies == 1 && itemHasSpawned == false){
+			itemHasSpawned = true;
+			loader.load('assets/Rayo.fbx',function(rayo){
+
+				rayo.scale.set(0.3,0.3,0.3);
+
+			rayo.position.x = 0
+			rayo.position.z = 0
+			rayo.position.y = 0;
+
+			rayo.name = "item";
+
+			console.log(rayo.position);
+
+		
+			scene.add(rayo);
+			BBitem = new THREE.Box3().setFromObject(rayo);
+
+			});
+		}
+	}
 
 	function createEnemy(){
 		var enemyMaterial = new THREE.MeshLambertMaterial({color: new THREE.Color(0.0,0.5,0.0)});
@@ -685,7 +747,7 @@
 		scene.add(grid);
 
 		
-		var loader = new THREE.FBXLoader();
+		loader = new THREE.FBXLoader();
 
 
 		loader.load('assets/CorrerInPlace.fbx',function(skeleton){
@@ -833,19 +895,7 @@
 
 		});
 
-		loader.load('assets/Rayo.fbx',function(rayo){
-
-			rayo.position.z = -10;
-			rayo.position.x = 42;
-			rayo.position.y = -0.4;
-
-			rayo.scale.set(0.2,0.2,0.2);
-
-
-
-			scene.add(rayo);
-
-		});
+		
 
 		loader.load('assets/sword.fbx',function(espada){
 

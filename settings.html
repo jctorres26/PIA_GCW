@@ -42,10 +42,10 @@
         <div></div>
         <div class="row row-cols-2">
           <div class="col">
-            <button type="button" class="btn btn-light btnS">Normal</button>
+            <button type="button" onclick="normalDifficulty();" class="btn btn-light btnS">Normal</button>
           </div>
           <div class="col">
-            <button type="button" class="btn btn-light btnS">Dificil</button>
+            <button type="button" onclick="hardDifficulty();" class="btn btn-light btnS">Dificil</button>
           </div>
         </div>
       </div>
@@ -55,6 +55,17 @@
 
 <script>
   function goMain() {
+    location.href = "./index.html";
+  }
+
+  function normalDifficulty() {
+    localStorage.setItem('hard', false);
+    location.href = "./index.html";
+   
+  }
+
+  function hardDifficulty() {
+    localStorage.setItem('hard', true);
     location.href = "./index.html";
   }
 </script>

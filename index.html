@@ -48,6 +48,18 @@
 </html>
 
 <script>
+
+$(document).ready(function() {
+  var difficulty = localStorage.getItem("hard");
+  if(difficulty == null){
+    localStorage.setItem("hard",false);
+   
+  }else{
+    localStorage.setItem("hard", difficulty);
+  }
+
+});
+
   function goToURL() {
       location.href = './settings.html';
   }
