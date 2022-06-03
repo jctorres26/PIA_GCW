@@ -30,7 +30,7 @@
         </div>
         <div class="row">
             <div class="d-flex justify-content-center">
-                <button type="button"   class="btn btn-light">Un jugador</button>
+                <button type="button" onclick = "goToGameSingleplayer();"  class="btn btn-light">Un jugador</button>
             </div>
         </div>
         <div class="row">
@@ -70,5 +70,10 @@ $(document).ready(function() {
   function goToGameMultiplayer() {
       location.href = './escena1MP.html';
   }
+
+  function goToGameSingleplayer() {
+      location.href = './escena1SP.html';
+  }
+
 </script>
 
