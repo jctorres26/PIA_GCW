@@ -30,12 +30,12 @@
         </div>
         <div class="row">
             <div class="d-flex justify-content-center">
-                <button type="button" class="btn btn-light">Un jugador</button>
+                <button type="button"   class="btn btn-light">Un jugador</button>
             </div>
         </div>
         <div class="row">
             <div class="d-flex justify-content-center">
-                <button type="button" class="btn btn-light">Dos jugadores</button>
+                <button type="button" onclick="goToGameMultiplayer();" class="btn btn-light">Dos jugadores</button>
             </div>
         </div>
         <div class="row">
@@ -53,6 +53,10 @@
   }
   function goToLeaderboard() {
       location.href = './leaderboards.html';
+  }
+
+  function goToGameMultiplayer() {
+      location.href = './escena1MP.html';
   }
 </script>
 
