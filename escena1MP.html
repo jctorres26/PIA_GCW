@@ -52,13 +52,15 @@
 	var secondBB;
 	var wall;
 	var wall2;
+	var wall3;
+	var wall4;
 	var playerIndex = [];
 	var enemyRate = 0;
 	var hasWon = false;
 	var hasLost = false;
 	var killedEnemies = 0;
 	var isPaused = false;
-	var playerSpeed = 5;
+	var playerSpeed = 7;
 	var playerDamage = 1;
 	var player1Health = 2;
 	var player2Health = 2;
@@ -118,7 +120,7 @@
 			color: 0xFFFFFF,
 			size: 1,
 			map: THREE.ImageUtils.loadTexture(
-			"./imgs//particula.png"
+			"./imgs//smoke.png"
 			),
 			blending: THREE.AdditiveBlending,
 			transparent: true
@@ -161,7 +163,7 @@
 				color: 0xFFFFFF,
 				size: 1,
 				map: THREE.ImageUtils.loadTexture(
-				"./imgs//particula.png"
+				"./imgs//magic.png"
 				),
 				blending: THREE.AdditiveBlending,
 				transparent: true
@@ -294,22 +296,29 @@
 
 		var wall1BB = new THREE.Box3().setFromObject(wall);
 		var wall2BB = new THREE.Box3().setFromObject(wall2);
-		var P1BB = new THREE.Box3().setFromObject(jugadores[0]);
-		var P2BB = new THREE.Box3().setFromObject(jugadores[1]);
+		var wall3BB = new THREE.Box3().setFromObject(wall3);
+		var wall4BB = new THREE.Box3().setFromObject(wall4);
+		var P1BB = new THREE.Box3().setFromCenterAndSize(jugadores[0].position, new THREE.Vector3( 1, 1, 1 ));
+		var P2BB = new THREE.Box3().setFromCenterAndSize(jugadores[1].position, new THREE.Vector3( 1, 1, 1 ));
+		 
 		
 		var playerCollision = P1BB.intersectsBox(P2BB);
 
 		var P1wall1Collision = wall1BB.intersectsBox(P1BB);
 		var P1wall2Collision = wall2BB.intersectsBox(P1BB);
+		var P1wall3Collision = wall3BB.intersectsBox(P1BB);
+		var P1wall4Collision = wall4BB.intersectsBox(P1BB);
 
 		var P2wall1Collision = wall1BB.intersectsBox(P2BB);
 		var P2wall2Collision = wall2BB.intersectsBox(P2BB);
+		var P2wall3Collision = wall3BB.intersectsBox(P2BB);
+		var P2wall4Collision = wall4BB.intersectsBox(P2BB);
 
-		if(P1wall1Collision || P1wall2Collision || playerCollision){
+		if(P1wall1Collision || P1wall2Collision  || P1wall3Collision  || P1wall4Collision || playerCollision){
 			jugadores[0].translateZ(-(jugadores[0].forward * deltaTime));
 		}
 
-		if(P2wall1Collision || P2wall2Collision || playerCollision){
+		if(P2wall1Collision || P2wall2Collision ||  P2wall3Collision  || P2wall4Collision  || playerCollision){
 			jugadores[1].translateZ(-(jugadores[1].forward * deltaTime));
 		}
 
@@ -320,7 +329,7 @@
 			if(itemP1Collision || itemP2Collision){
 				console.log("item");
 				hasItem = true;
-				playerSpeed = 9;
+				playerSpeed = 10;
 				var item = scene.getObjectByName("item");
 				scene.remove(item);
 				
@@ -331,7 +340,9 @@
 		//ENEMY COLLISION WITH PLAYER 1
 		for(var j=0; j<enemies.length; j++){
 			
-			var enemyBB = new THREE.Box3().setFromObject(enemies[j]);
+			var enemyBB = new THREE.Box3().setFromCenterAndSize(enemies[j].position, new THREE.Vector3( 1, 1.5, 1 ));
+			
+		
 
 			var enemyPlayer1Collision = P1BB.intersectsBox(enemyBB);
 			var enemyPlayer2Collision = P2BB.intersectsBox(enemyBB);
@@ -371,10 +382,11 @@
 				
 
 				var firstBB = new THREE.Box3().setFromObject(balas[i]);
-				secondBB = new THREE.Box3().setFromObject(enemies[j]);
+				secondBB = new THREE.Box3().setFromCenterAndSize(enemies[j].position, new THREE.Vector3( 1, 1, 1 ));
 				var collision = firstBB.intersectsBox(secondBB);
 
-				
+				//  var helper = new THREE.Box3Helper( secondBB, 0xffff00 );
+		 		//  scene.add(helper);
 			
 
 				if(collision && enemies[j].isAlive){
@@ -482,11 +494,14 @@
 
 	
 	
+	
 		if(isPaused){
 		
 			document.getElementById('pauseMenu').style.display='block';
 			
+			
 			clock.running = false;
+
 			
 			
 			
@@ -545,7 +560,7 @@
 
 
 
-	var velocidadBala = -5;
+	var velocidadBala = -10;
 
 	var cameras = [];
 
@@ -575,6 +590,10 @@
 		
 	}
 
+	
+
+	
+
 	function spawnItem(){
 		if(killedEnemies == 1 && itemHasSpawned == false){
 			itemHasSpawned = true;
@@ -601,7 +620,7 @@
 	function createEnemy(){
 		var enemyMaterial = new THREE.MeshLambertMaterial({color: new THREE.Color(0.0,0.5,0.0)});
 		var enemyGeometry =  new THREE.BoxGeometry(1,1,1);
-		enemy = new THREE.Mesh(enemyGeometry, enemyMaterial);
+		enemy = new THREE.Mesh(enemyGeometry, 0);
 		enemy.position.x =  getRandomArbitrary(5,20);
 		enemy.position.z =  getRandomArbitrary(5,20);
 		enemy.isAlive = true;
@@ -610,6 +629,34 @@
 		
 		enemies.push(enemy);
 		scene.add(enemies[enemies.length-1]);
+
+		loader.load('assets/CorrerInPlace.fbx',function(skeleton){
+
+			skeleton.mixer =  new THREE.AnimationMixer(skeleton);
+
+			mixers.push(skeleton.mixer);
+
+			var action = skeleton.mixer.clipAction(skeleton.animations[0]);
+			action.play();
+			
+			
+
+			
+
+			
+			skeleton.scale.set(0.05,0.05,0.05);
+			
+			enemies[enemies.length-1].add(skeleton);
+			
+
+			
+
+			
+
+			});
+
+			
+
 		followPlayer();
 	
 	}
@@ -744,197 +791,93 @@
 
 		var grid = new THREE.GridHelper(100, 30, 0xffffff, 0xffffff);
 		grid.position.y = -1;
-		scene.add(grid);
+		//scene.add(grid);
 
 		
 		loader = new THREE.FBXLoader();
 
 
-		loader.load('assets/CorrerInPlace.fbx',function(skeleton){
-
-			skeleton.mixer =  new THREE.AnimationMixer(skeleton);
-
-			mixers.push(skeleton.mixer);
-
-			var action = skeleton.mixer.clipAction(skeleton.animations[0]);
-			action.play();
-
-			skeleton.scale.set(0.05,0.05,0.05);
-
-			skeleton.position.z = -10;
-			skeleton.position.x = 0;
-			skeleton.position.y = -2;
-
-			scene.add(skeleton);
-
-		});
-
-		loader.load('assets/AtaqueSkeleton.fbx',function(skeletonAttack){
-
-			skeletonAttack.mixer =  new THREE.AnimationMixer(skeletonAttack);
-
-			mixers.push(skeletonAttack.mixer);
-
-			var action = skeletonAttack.mixer.clipAction(skeletonAttack.animations[0]);
-			action.play();
-
-			skeletonAttack.scale.set(0.05,0.05,0.05);
-
-			skeletonAttack.position.z = -10;
-			skeletonAttack.position.x = -3;
-			skeletonAttack.position.y = -2;
-
-			scene.add(skeletonAttack);
-
-			});
+		
 
 
-		loader.load('assets/Corriendo.fbx',function(wizardRunning){
-
-			wizardRunning.mixer =  new THREE.AnimationMixer(wizardRunning);
-
-			mixers.push(wizardRunning.mixer);
-
-			var action = wizardRunning.mixer.clipAction(wizardRunning.animations[0]);
-			action.play();
-
-			wizardRunning.scale.set(0.05,0.05,0.05);
-
-			wizardRunning.position.z = -10;
-			wizardRunning.position.x = 5;
-			wizardRunning.position.y = -2;
-
-			scene.add(wizardRunning);
+	
 
 
-		});
+	
 
-		loader.load('assets/AtaqueWizard.fbx',function(wizardAttack){
-
-			wizardAttack.mixer =  new THREE.AnimationMixer(wizardAttack);
-
-			mixers.push(wizardAttack.mixer);
-
-			var action = wizardAttack.mixer.clipAction(wizardAttack.animations[0]);
-			action.play();
-
-			wizardAttack.scale.set(0.05,0.05,0.05);
-
-			wizardAttack.position.z = -10;
-			wizardAttack.position.x = 12;
-			wizardAttack.position.y = -2;
-
-			scene.add(wizardAttack);
-
-
-		});
 
 		
-		loader.load('assets/Caminando.fbx',function(wizardWalk){
+	
 
-			wizardWalk.mixer =  new THREE.AnimationMixer(wizardWalk);
+		// loader.load('assets/medkit.fbx',function(medkit){
 
-			mixers.push(wizardWalk.mixer);
+		// 	medkit.position.z = -10;
+		// 	medkit.position.x = 42;
+		// 	medkit.position.y = 0;
 
-			var action = wizardWalk.mixer.clipAction(wizardWalk.animations[0]);
-			action.play();
-
-			wizardWalk.scale.set(0.05,0.05,0.05);
-
-			wizardWalk.position.z = -10;
-			wizardWalk.position.x = 18;
-			wizardWalk.position.y = -2;
-
-			scene.add(wizardWalk);
-
-
-		});
-
-		loader.load('assets/escenario01.fbx',function(escenario){
-
-			escenario.position.z = -5;
-			escenario.position.x = -50;
-			escenario.position.y = -3;
-
-			escenario.scale.set(0.2,0.2,0.2);
-
-			escenario.name = 'escenario01';
-
-			scene.add(escenario);
-
-		});
-
-		
-		loader.load('assets/Wizard2.fbx',function(wizard2){
-
-			wizard2.position.z = -10;
-			wizard2.position.x = 38;
-			wizard2.position.y = -2;
-
-			wizard2.scale.set(0.05,0.05,0.05);
-
-			
-
-			scene.add(wizard2);
-
-			
-
-		});
-
-		loader.load('assets/medkit.fbx',function(medkit){
-
-			medkit.position.z = -10;
-			medkit.position.x = 42;
-			medkit.position.y = 0;
-
-			medkit.scale.set(0.2,0.2,0.2);
+		// 	medkit.scale.set(0.2,0.2,0.2);
 
 
 
-			scene.add(medkit);
+		// 	scene.add(medkit);
 
-		});
+		// });
 
 		
 
-		loader.load('assets/sword.fbx',function(espada){
+		// loader.load('assets/sword.fbx',function(espada){
 
-			espada.position.z = -10;
-			espada.position.x = 44;
-			espada.position.y = -0.4;
+		// 	espada.position.z = -10;
+		// 	espada.position.x = 44;
+		// 	espada.position.y = -0.4;
 
-			espada.scale.set(0.2,0.2,0.2);
+		// 	espada.scale.set(0.2,0.2,0.2);
 
 
 
-			scene.add(espada);
+		// 	scene.add(espada);
 
-		});
+		// });
 
 		
 
 		var cubeMaterial = new THREE.MeshLambertMaterial({color: new THREE.Color(0.0,0.0,0.5)});
 		var cubeGeometry =  new THREE.BoxGeometry(1,1,1);
-		var jugador1 = new THREE.Mesh(cubeGeometry, cubeMaterial);
+		var jugador1 = new THREE.Mesh(cubeGeometry, 0);
 		
 		var wallMaterial = new THREE.MeshLambertMaterial({color: new THREE.Color(0.0,0.5,0.5)});
 		
-		var wallGeometry =  new THREE.BoxGeometry(20,1,1);
+		var wallGeometry =  new THREE.BoxGeometry(150,1,1);
 	
-		 wall = new THREE.Mesh(wallGeometry, wallMaterial);
-		 wall2 = wall.clone();
-		wall.position.z = -5;
+		 wall = new THREE.Mesh(wallGeometry, 0);
+		 wall2 = new THREE.Mesh(wallGeometry, 0);
+		 wall3 = new THREE.Mesh(wallGeometry, 0);
+		 wall4 = new THREE.Mesh(wallGeometry, 0);
+
+		wall.position.z = -41;
+		wall.position.x= -20;
 		scene.add(wall);
 
 		
-		wall2.rotation.y = THREE.Math.degToRad(90);
-		wall2.position.x = 10; 
+		
+		
 		scene.add(wall2);
+
+		wall2.rotation.y = THREE.Math.degToRad(90);
+		wall2.position.x = 25;
+
+		scene.add(wall3);
+		wall3.rotation.y = THREE.Math.degToRad(90);
+		wall3.position.x = -50;
+
+
+		scene.add(wall4);
+		wall4.position.z = 47;
 		
 		scene.add(jugador1);
 
 		var jugador2 = jugador1.clone();
-		jugador2.material =  new THREE.MeshLambertMaterial({color: new THREE.Color(0.5,0.0,0.0)});
+		//jugador2.material =  new THREE.MeshLambertMaterial({color: new THREE.Color(0.5,0.0,0.0)});
 
 		
 		scene.add(jugador2);
@@ -947,10 +890,13 @@
 		
 		jugador1.name = "jugador1";
 
-		jugador1.position.x =jugador1.position.x + 5;
+		jugador1.position.x =jugador1.position.x - 10;
+		jugador2.position.x =jugador2.position.x - 5;
+	
 
 		jugadores.push(jugador1);
 		jugadores.push(jugador2);
+
 
 		cameras[0].position.y = 10;
 		cameras[1].position.y = 10;
@@ -958,14 +904,62 @@
 		console.log(jugadores[0].name);
 
 		
-		createEnemy();
-		createEnemy();
-		createEnemy();
-		
+		loader.load('assets/Corriendo.fbx',function(wizardRunning){
+
+		wizardRunning.mixer =  new THREE.AnimationMixer(wizardRunning);
+
+		mixers.push(wizardRunning.mixer);
+
+		var action = wizardRunning.mixer.clipAction(wizardRunning.animations[0]);
+		action.play();
+
+		wizardRunning.scale.set(0.04,0.04,0.04);
+		wizardRunning.rotation.y = THREE.Math.degToRad(180);
 
 		
 		
-		followPlayer();
+			jugadores[0].add(wizardRunning);
+
+		});
+
+		loader.load('assets/runInPlace.fbx',function(redWizardRunning){
+
+			redWizardRunning.mixer =  new THREE.AnimationMixer(redWizardRunning);
+
+			mixers.push(redWizardRunning.mixer);
+
+			var action = redWizardRunning.mixer.clipAction(redWizardRunning.animations[0]);
+			action.play();
+
+			redWizardRunning.scale.set(0.04,0.04,0.04);
+			redWizardRunning.rotation.y = THREE.Math.degToRad(180);
+
+			
+
+				jugadores[1].add(redWizardRunning);
+
+			});
+
+
+			
+			loader.load('assets/escenario1.fbx',function(escenario){
+
+				escenario.position.z = -10;
+				escenario.position.x = 125;
+				escenario.position.y = 5;
+
+				escenario.scale.set(0.04,0.04,0.04);
+
+
+
+				scene.add(escenario);
+
+			});
+						
+		
+		
+		
+		//followPlayer();
 
 		$("#scene-section").append(renderers[0].domElement);
 		$("#scene-section-2").append(renderers[1].domElement);

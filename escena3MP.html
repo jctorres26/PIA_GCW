@@ -68,11 +68,11 @@
 	var player2Health = 2;
 	var enemySpeed = 0.5;
 	var enemyDamage = 1;
-	var enemiesToKill = 4;
+	var enemiesToKill = 5;
 	var totalTime = 0;
 	var isImmuneP1 = false;
 	var isImmuneP2 = false;
-	var maxAmountEnemies = 6;
+	var maxAmountEnemies = 8;
 	var hasItem = false;
 	var itemHasSpawned = false;
 	var isFollowing = false;
@@ -331,7 +331,11 @@
 			if(itemP1Collision || itemP2Collision){
 				console.log("item");
 				hasItem = true;
-				playerDamage = 2;
+				if(jugadores[0].isAlive){
+				jugadores[0].health = jugadores[0].health + 1;}
+				if(jugadores[1].isAlive){
+				jugadores[1].health = jugadores[1].health + 1;}
+
 				var item = scene.getObjectByName("item");
 				scene.remove(item);
 				
@@ -548,7 +552,7 @@
 		
 
 		//console.log(enemyRate * deltaTime);
-		enemyRate = enemyRate + 1.5;
+		enemyRate = enemyRate + 2;
 
 		if((enemyRate*deltaTime >= 10) && enemies.length < maxAmountEnemies){
 			createEnemy();
@@ -600,7 +604,7 @@
 	function spawnItem(){
 		if(killedEnemies == 1 && itemHasSpawned == false){
 			itemHasSpawned = true;
-			loader.load('assets/sword.fbx',function(rayo){
+			loader.load('assets/medkit.fbx',function(rayo){
 
 				rayo.scale.set(0.3,0.3,0.3);
 
@@ -857,8 +861,8 @@
 		 wall3 = new THREE.Mesh(wallGeometry, 0);
 		 wall4 = new THREE.Mesh(wallGeometry, 0);
 
-		wall.position.z = -41;
-		wall.position.x= -20;
+		wall.position.z = -25;
+		wall.position.x= 0;
 		scene.add(wall);
 
 		
@@ -867,11 +871,11 @@
 		scene.add(wall2);
 
 		wall2.rotation.y = THREE.Math.degToRad(90);
-		wall2.position.x = 28;
+		wall2.position.x = 27;
 
 		scene.add(wall3);
 		wall3.rotation.y = THREE.Math.degToRad(90);
-		wall3.position.x = -36;
+		wall3.position.x = -29.5;
 
 
 		scene.add(wall4);
@@ -945,10 +949,10 @@
 
 
 			
-			loader.load('assets/test2.fbx',function(escenario){
+			loader.load('assets/escenario3test.fbx',function(escenario){
 
-				escenario.position.z = -20;
-				escenario.position.x = 10;
+				escenario.position.z = -10;
+				escenario.position.x = -92;
 				escenario.position.y = 7;
 
 				escenario.scale.set(0.05,0.05,0.05);
@@ -985,10 +989,10 @@
 
 <div id="id01" class="modal">
  
-  <form class="modal-content" action="./escena3MP.html">
+  <form class="modal-content" action="./name.html">
     <div class="container">
-      <h1>Has superado el nivel!</h1>
-      <p>Presiona el boton para seguir con tu aventura:</p>
+      <h1>Has completado el ultimo nivel!</h1>
+      <p>Presiona el boton para ver tu tiempo:</p>
 
       <div class="clearfix">
         <button type="submit" class="cancelbtn">Continuar</button>
@@ -1015,7 +1019,7 @@
         
 	<div id="pauseMenu" class="modal">
 	
-		<form class="modal-content" action="./escena2MP.html">
+		<form class="modal-content" action="./escena3MP.html">
 		  <div class="container">
 			<h1>PAUSA</h1>
 			
